@@ -1,0 +1,17 @@
+<Project Sdk="WixToolset.Sdk/5.0.2">
+
+  <!--
+    Minimal MSI around the single-file AltMixer.exe.
+    dotnet build installer/AltMixer.Installer.wixproj -c Release -p:ProductVersion=1.2.3 -p:PublishDir=path\to\publish\
+  -->
+  <PropertyGroup>
+    <OutputName>AltMixer</OutputName>
+    <InstallerPlatform>x64</InstallerPlatform>
+    <ProductVersion Condition="'$(ProductVersion)' == ''">0.0.1</ProductVersion>
+    <PublishDir Condition="'$(PublishDir)' == ''">$(MSBuildThisFileDirectory)..\publish\</PublishDir>
+    <!-- Per-machine install: these ICEs assume the Start menu is per-user and misfire. -->
+    <SuppressIces>ICE38;ICE43;ICE57</SuppressIces>
+    <DefineConstants>ProductVersion=$(ProductVersion);PublishDir=$(PublishDir)</DefineConstants>
+  </PropertyGroup>
+
+</Project>

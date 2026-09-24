@@ -1,0 +1,73 @@
+name: Release
+
+# Push a version tag (1.2.3 or v1.2.3) to build, test and publish a GitHub Release named "1.2.3"
+# with exactly two assets: the MSI and the single-file exe.
+# Run manually (Actions → Release → Run workflow) for a dry run: same build, uploaded as a workflow artifact, no release.
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # tags and history for the release notes
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Work out version
+        id: version
+        shell: pwsh
+        run: |
+          $v = if ($env:GITHUB_REF_TYPE -eq 'tag') { $env:GITHUB_REF_NAME -replace '^v', '' } else { '0.0.0' }
+          "version=$v" >> $env:GITHUB_OUTPUT
+
+      - name: Test
+        run: dotnet test tests/AltMixer.Core.Tests -c Release
+
+      - name: Publish exe
+        run: dotnet publish src/AltMixer -c Release -o publish -p:Version=${{ steps.version.outputs.version }}
+
+      - name: Build MSI
+        run: dotnet build installer/AltMixer.Installer.wixproj -c Release -p:ProductVersion=${{ steps.version.outputs.version }}
+
+      - name: Stage assets
+        shell: pwsh
+        run: |
+          $v = '${{ steps.version.outputs.version }}'
+          New-Item -ItemType Directory dist | Out-Null
+          Copy-Item publish/AltMixer.exe "dist/AltMixer-$v-win-x64.exe"
+          Copy-Item installer/bin/Release/AltMixer.msi "dist/AltMixer-$v-win-x64.msi"
+          Get-ChildItem dist
+
+      - name: Release notes
+        shell: pwsh
+        run: ./build/release-notes.ps1 -Version '${{ steps.version.outputs.version }}' -Ref $env:GITHUB_REF_NAME -OutFile notes.md
+
+      - name: Upload dry-run build
+        if: github.ref_type != 'tag'
+        uses: actions/upload-artifact@v4
+        with:
+          name: altmixer-dry-run
+          path: |
+            dist/
+            notes.md
+
+      - name: Publish release
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ steps.version.outputs.version }}
+          body_path: notes.md
+          files: dist/*
+          fail_on_unmatched_files: true

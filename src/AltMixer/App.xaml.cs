@@ -47,7 +47,7 @@ public partial class App : Application
         _engine = new Engine(store);
         var vm = new MainViewModel(_engine);
         _window = new MainWindow { DataContext = vm };
-        _tray = new Tray(ShowWindow, _engine.RestoreAll, Exit);
+        _tray = new Tray(ShowWindow, _engine.RestoreAll, Quit);
         vm.NewDrift += text => { if (!_window.IsVisible) _tray.Notify(text); };
         _engine.StateChanged += state => Dispatcher.BeginInvoke(() =>
         {
@@ -67,10 +67,17 @@ public partial class App : Application
         _window.Activate();
     }
 
-    public void Exit()
+    public void Quit()
     {
         if (_window != null) { _window.ReallyClose = true; _window.Close(); }
         Shutdown();
+    }
+
+    /// <summary>Logoff, shutdown, or an installer asking us to close: really close rather than hide to the tray.</summary>
+    protected override void OnSessionEnding(SessionEndingCancelEventArgs e)
+    {
+        if (_window != null) _window.ReallyClose = true;
+        base.OnSessionEnding(e);
     }
 
     protected override void OnExit(ExitEventArgs e)

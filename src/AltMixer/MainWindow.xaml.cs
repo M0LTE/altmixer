@@ -42,6 +42,6 @@ public partial class MainWindow : Window
     void OpenFolder_Click(object sender, RoutedEventArgs e) =>
         Process.Start(new ProcessStartInfo(Path.GetDirectoryName(DesiredStore.DefaultPath)!) { UseShellExecute = true });
 
-    void Exit_Click(object sender, RoutedEventArgs e) => ((App)Application.Current).Exit();
+    void Exit_Click(object sender, RoutedEventArgs e) => ((App)Application.Current).Quit();
 }
 

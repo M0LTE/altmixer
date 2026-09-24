@@ -28,18 +28,37 @@ with one click. Lock a setting and AltMixer puts it back automatically.
 On first run AltMixer takes the current state as desired, except that levels above 0 dB are flagged to come down.
 Desired state lives in `%APPDATA%\AltMixer\state.json`.
 
+## Install
+
+Download the MSI (or the portable exe) from [Releases](https://github.com/M0LTE/altmixer/releases). Requires Windows 11
+x64 and the [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0).
+
 ## Build and run
 
-Requires the .NET 10 SDK on Windows 10/11.
+Requires the .NET 10 SDK.
 
 ```
 dotnet build
 dotnet test
-dotnet publish src/AltMixer -c Release -o publish    # exit AltMixer first; Start at login points at publish\AltMixer.exe
+dotnet publish src/AltMixer -c Release -o publish      # single-file publish\AltMixer.exe (exit AltMixer first)
+dotnet build installer/AltMixer.Installer.wixproj -c Release -p:ProductVersion=1.2.3   # MSI from publish\
 publish\AltMixer.exe [--tray] [--dump out.txt]
 ```
 
 `--dump` writes everything AltMixer sees (devices, settings, ranges, drift) to a file and exits without changing anything.
+
+## Releasing
+
+Add a `## 1.2.3` section to `CHANGELOG.md`, commit, then tag and push:
+
+```
+git tag 1.2.3 && git push origin 1.2.3
+```
+
+`.github/workflows/release.yml` tests, builds the exe and MSI, and publishes a GitHub Release named `1.2.3` with those
+two files attached. The notes come from the changelog section, or from the commits since the previous tag if there's no
+section. Running the workflow by hand does a dry run: everything is built and uploaded as a workflow artifact, and no
+release is made.
 
 ## Layout
 
@@ -52,6 +71,7 @@ publish\AltMixer.exe [--tray] [--dump out.txt]
     enforces locks, so it keeps working while the window is hidden.
 - `src/AltMixer`: WPF UI (Fluent theme, follows Windows light/dark), tray icon, start at login.
 - `tests/AltMixer.Core.Tests`: reconciler and store tests.
+- `installer/`: WiX MSI. `build/release-notes.ps1`: release notes.
 - `spike/`: the investigation. See `spike/FINDINGS.md` for where Windows keeps each setting and what was measured.
 
 ## Known limitations
