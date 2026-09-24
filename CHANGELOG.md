@@ -3,6 +3,12 @@
 Release notes are taken from the section matching the tag (e.g. `## 0.1.0`). If there isn't one, the release lists the
 commits since the previous tag instead.
 
+## 0.2.0
+
+- **Reorder devices** by dragging the handle on each card, or with ↑ / ↓ on a focused handle. The order is saved,
+  unplugged devices keep their place, and a device adopted on a new USB port takes its old position.
+- The drag handle is exposed to screen readers as a thumb control.
+
 ## 0.1.0
 
 First release.

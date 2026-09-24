@@ -25,6 +25,9 @@ with one click. Lock a setting and AltMixer puts it back automatically.
 | 🔓 / 🔒 | Unlocked: changes are flagged. Locked: changes are put back automatically. |
 | red ⚠ | Locked, but something keeps changing it (5 times in 30 s), so AltMixer has stopped fighting. Restore to try again. |
 
+Drag a device by its handle (═) to reorder it within its section, or focus the handle and press ↑ / ↓. The order is
+remembered, including the places of devices that are currently unplugged. Click › to collapse or expand a device.
+
 On first run AltMixer takes the current state as desired, except that levels above 0 dB are flagged to come down.
 Desired state lives in `%APPDATA%\AltMixer\state.json`.
 

@@ -70,3 +70,17 @@ public static class SliderWheel
         e.Handled = true;
     }
 }
+
+/// <summary>A drag handle: a Border that shows up to UI Automation (screen readers, tests) as a thumb.</summary>
+public sealed class DragHandle : System.Windows.Controls.Border
+{
+    protected override System.Windows.Automation.Peers.AutomationPeer OnCreateAutomationPeer() => new Peer(this);
+
+    sealed class Peer(DragHandle owner) : System.Windows.Automation.Peers.FrameworkElementAutomationPeer(owner)
+    {
+        protected override System.Windows.Automation.Peers.AutomationControlType GetAutomationControlTypeCore() =>
+            System.Windows.Automation.Peers.AutomationControlType.Thumb;
+        protected override string GetClassNameCore() => nameof(DragHandle);
+        protected override bool IsKeyboardFocusableCore() => true;
+    }
+}

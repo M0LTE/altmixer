@@ -13,6 +13,7 @@ public sealed record EngineState(
     IReadOnlyDictionary<string, SettingStatus> Status,
     IReadOnlyList<AdoptOffer> AdoptOffers,
     IReadOnlyDictionary<string, bool> Collapsed,
+    IReadOnlyList<string> DeviceOrder,
     IReadOnlyDictionary<string, string> KnownNames,
     string? LastError)
 {
@@ -111,6 +112,20 @@ public sealed class Engine : IDisposable
 
     public void SetCollapsed(string deviceId, bool collapsed) => Post(() => _store.SetCollapsed(deviceId, collapsed));
 
+    /// <summary>Move a device up (-1) or down (+1) within its section.</summary>
+    public void MoveDevice(string deviceId, int delta) => Reorder(deviceId, (shown, from) => from + delta);
+
+    /// <summary>Move a device to a position within its section (as displayed).</summary>
+    public void MoveDeviceTo(string deviceId, int index) => Reorder(deviceId, (_, _) => index);
+
+    void Reorder(string deviceId, Func<List<string>, int, int> target) => Post(() =>
+    {
+        if (_snapshot.Devices.FirstOrDefault(d => d.Id == deviceId) is not { } dev) return;
+        var shown = DeviceOrdering.Sort(_snapshot.Devices.Where(d => d.Flow == dev.Flow), _store.Data.Ui.DeviceOrder).Select(d => d.Id).ToList();
+        var index = target(shown, shown.IndexOf(deviceId));
+        if (DeviceOrdering.MoveTo(_store.Data.Ui.DeviceOrder, shown, deviceId, index) is { } order) _store.SetDeviceOrder(order);
+    });
+
     void Post(Action a)
     {
         _commands.Add(a);
@@ -184,6 +199,7 @@ public sealed class Engine : IDisposable
         // Reflect commands (lock, accept) that ran after the last reconcile.
         var status = _last.Status.ToDictionary(kv => kv.Key, kv => _store.Get(kv.Key) is { } e ? kv.Value with { Desired = e.Value, Locked = e.Locked } : kv.Value);
         StateChanged?.Invoke(new EngineState(_snapshot, status, _last.AdoptOffers.Where(o => _store.Data.Devices.TryGetValue(o.NewId, out var k) && !k.AdoptResolved).ToList(), collapsed,
+            _store.Data.Ui.DeviceOrder.ToList(),
             _store.Data.Devices.ToDictionary(d => d.Key, d => d.Value.Name), _lastError));
     }
 

@@ -67,8 +67,22 @@ public class GroupViewModel(Engine engine, string id) : Observable
     }
 }
 
-public sealed class DeviceViewModel(Engine engine, string id) : GroupViewModel(engine, id)
+public sealed class DeviceViewModel : GroupViewModel
 {
+    public DeviceViewModel(Engine engine, string id) : base(engine, id)
+    {
+        MoveUpCommand = new Command(() => engine.MoveDevice(id, -1));
+        MoveDownCommand = new Command(() => engine.MoveDevice(id, +1));
+    }
+
+    public Command MoveUpCommand { get; }
+    public Command MoveDownCommand { get; }
+
+    bool _dropAbove, _dropBelow;
+    /// <summary>Insertion line shown while another card is dragged over this one.</summary>
+    public bool DropAbove { get => _dropAbove; set => Set(ref _dropAbove, value); }
+    public bool DropBelow { get => _dropBelow; set => Set(ref _dropBelow, value); }
+
     bool _collapsed;
     bool _updating;
 
@@ -158,6 +172,36 @@ public sealed class MainViewModel : Observable
     public string? LastError { get => _error; private set { if (Set(ref _error, value)) Raise(nameof(HasError)); } }
     public bool HasError => !string.IsNullOrEmpty(_error);
 
+    // ---- drag to reorder (within a section only)
+
+    ObservableCollection<DeviceViewModel>? SectionOf(DeviceViewModel d) => Outputs.Contains(d) ? Outputs : Inputs.Contains(d) ? Inputs : null;
+
+    /// <summary>Shows where <paramref name="dragged"/> would land; returns false if it can't be dropped there.</summary>
+    public bool DragOver(DeviceViewModel dragged, DeviceViewModel target, bool below)
+    {
+        ClearDropHints();
+        var section = SectionOf(dragged);
+        if (section == null || !section.Contains(target) || target == dragged) return false;
+        target.DropAbove = !below;
+        target.DropBelow = below;
+        return true;
+    }
+
+    public void Drop(DeviceViewModel dragged, DeviceViewModel target, bool below)
+    {
+        ClearDropHints();
+        var section = SectionOf(dragged);
+        if (section == null || !section.Contains(target) || target == dragged) return;
+        var to = section.IndexOf(target) + (below ? 1 : 0);
+        if (section.IndexOf(dragged) < to) to--;
+        _engine.MoveDeviceTo(dragged.Id, to);
+    }
+
+    public void ClearDropHints()
+    {
+        foreach (var d in Outputs.Concat(Inputs)) { d.DropAbove = false; d.DropBelow = false; }
+    }
+
     /// <summary>Raised with a short description when new drift appears (for the tray balloon).</summary>
     public event Action<string>? NewDrift;
     HashSet<string> _knownDrift = new();
@@ -172,8 +216,7 @@ public sealed class MainViewModel : Observable
         CollectionSync.Sync(SystemSettings, byOwner[Ids.System].ToList(), s => s.Id, vm => vm.Id, s => new SettingViewModel(_engine, s),
             (vm, s) => vm.Update(s, state.Status.GetValueOrDefault(s.Id), state.KnownNames));
 
-        List<DeviceInfo> Devices(Flow f) => snap.Devices.Where(d => d.Flow == f)
-            .OrderBy(d => d.Status).ThenByDescending(d => d.IsDefault).ThenByDescending(d => d.IsComms).ThenBy(d => d.Name, StringComparer.OrdinalIgnoreCase).ToList();
+        List<DeviceInfo> Devices(Flow f) => DeviceOrdering.Sort(snap.Devices.Where(d => d.Flow == f), state.DeviceOrder);
         CollectionSync.Sync(Outputs, Devices(Flow.Render), d => d.Id, vm => vm.Id, d => new DeviceViewModel(_engine, d.Id), (vm, d) => vm.Update(d, state));
         CollectionSync.Sync(Inputs, Devices(Flow.Capture), d => d.Id, vm => vm.Id, d => new DeviceViewModel(_engine, d.Id), (vm, d) => vm.Update(d, state));
         CollectionSync.Sync(Apps, snap.Apps, a => a.Key, vm => vm.Id, a => new AppViewModel(_engine, a.Key), (vm, a) => vm.Update(a, state));

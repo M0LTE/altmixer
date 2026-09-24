@@ -31,6 +31,7 @@ if ($start -ge 0) {
     git log --no-merges --pretty=format:'- %s' $range | ForEach-Object { $notes.Add($_) }
 }
 
+while ($notes.Count -gt 0 -and [string]::IsNullOrWhiteSpace($notes[$notes.Count - 1])) { $notes.RemoveAt($notes.Count - 1) }
 $notes.Add('')
 $notes.Add('## Downloads')
 $notes.Add('')

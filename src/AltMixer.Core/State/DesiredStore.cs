@@ -31,6 +31,9 @@ public sealed class UiState
 {
     /// <summary>Per-device collapsed state; absent = default (collapsed only when disabled).</summary>
     public Dictionary<string, bool> Collapsed { get; set; } = new();
+
+    /// <summary>Device ids in the user's order (see <see cref="DeviceOrdering"/>).</summary>
+    public List<string> DeviceOrder { get; set; } = new();
 }
 
 public sealed class StoreData
@@ -118,6 +121,12 @@ public sealed class DesiredStore
         Dirty = true;
     }
 
+    public void SetDeviceOrder(List<string> order)
+    {
+        Data.Ui.DeviceOrder = order;
+        Dirty = true;
+    }
+
     public void MarkDirty() => Dirty = true;
 
     /// <summary>
@@ -139,6 +148,12 @@ public sealed class DesiredStore
                 if (e.Value.Text == oldId) e.Value = e.Value with { Text = newId };
         }
         if (Data.Ui.Collapsed.Remove(oldId, out var c)) Data.Ui.Collapsed[newId] = c;
+        var at = Data.Ui.DeviceOrder.IndexOf(oldId);
+        if (at >= 0)
+        {
+            Data.Ui.DeviceOrder.Remove(newId);
+            Data.Ui.DeviceOrder[Data.Ui.DeviceOrder.IndexOf(oldId)] = newId;
+        }
         Data.Devices.Remove(oldId);
         Dirty = true;
     }
