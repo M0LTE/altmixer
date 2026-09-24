@@ -1,6 +1,6 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <!-- UpgradeCode must never change: it's how a new version finds and replaces the old one. -->
-  <Package Name="AltMixer" Manufacturer="M0LTE" Version="$(var.ProductVersion)"
+  <Package Name="AltMixer" Manufacturer="Tom M0LTE" Version="$(var.ProductVersion)"
            UpgradeCode="478e9713-fca0-43bf-9ca7-2ed2ab48e3d7" Scope="perMachine" Compressed="yes">
     <SummaryInformation Description="AltMixer: desired-state audio mixer for Windows" />
     <MajorUpgrade DowngradeErrorMessage="A newer version of AltMixer is already installed." />

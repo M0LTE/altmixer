@@ -86,4 +86,4 @@ release is made.
 
 ## Licence
 
-[GNU AGPL v3](LICENSE). Copyright (C) 2026 M0LTE.
+[GNU AGPL v3](LICENSE). Copyright (C) 2026 Tom M0LTE.
