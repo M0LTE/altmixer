@@ -100,7 +100,7 @@
                 </Grid.ColumnDefinitions>
                 <ToggleButton Style="{StaticResource MuteToggle}" IsChecked="{Binding Mute.Flag}" AutomationProperties.Name="Mute" Background="Transparent" BorderThickness="0"
                               Visibility="{Binding Mute, Converter={x:Static local:NotNullVisible.Instance}}" />
-                <Slider Grid.Column="1" Minimum="{Binding Level.Min}" Maximum="{Binding Level.Max}" Value="{Binding Level.Number}"
+                <Slider Grid.Column="1" AutomationProperties.Name="Level" AutomationProperties.AutomationId="{Binding Level.Id, StringFormat=value:{0}}" Minimum="{Binding Level.Min}" Maximum="{Binding Level.Max}" Value="{Binding Level.Number}"
                         SmallChange="{Binding Level.SmallChange}" LargeChange="{Binding Level.LargeChange}" IsMoveToPointEnabled="True"
                         local:SliderWheel.Enabled="True" VerticalAlignment="Center" IsEnabled="{Binding Level.IsFixed, Converter={x:Static local:Not.Instance}}" />
                 <TextBlock Grid.Column="2" Text="{Binding Level.ValueText}" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="8,0,0,0" />

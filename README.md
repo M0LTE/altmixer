@@ -23,7 +23,7 @@ with one click. Lock a setting and AltMixer puts it back automatically.
 |---|---|
 | ⚠ ↺ ✓ | Changed outside AltMixer. ↺ restores your value; ✓ keeps the new one. Hover ⚠ for details. |
 | 🔓 / 🔒 | Unlocked: changes are flagged. Locked: changes are put back automatically. |
-| red ⚠ | Locked, but something keeps changing it (5 times in 30 s), so AltMixer has stopped fighting. Restore to try again. |
+| red ⚠ | Locked, but something has kept changing it back for 30 s or more, so AltMixer has paused. It tries again after 10 s of quiet, or when you click Restore. |
 
 Drag a device by its handle (═) to reorder it within its section, or focus the handle and press ↑ / ↓. The order is
 remembered, including the places of devices that are currently unplugged. Click › to collapse or expand a device.

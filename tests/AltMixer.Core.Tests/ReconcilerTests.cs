@@ -76,20 +76,92 @@ public class ReconcilerTests
         Assert.Equal(false, Assert.Single(r.ToApply).Value.Flag);
     }
 
-    [Fact]
-    public void Lock_gives_up_after_repeated_fights_and_resets_on_request()
+    sealed class FakeClock
+    {
+        public DateTime Now = new(2026, 9, 24, 12, 0, 0, DateTimeKind.Utc);
+        public void Advance(double seconds) => Now = Now.AddSeconds(seconds);
+    }
+
+    static (DesiredStore store, Reconciler rec, FakeClock clock) LockedToggle()
     {
         var store = new DesiredStore(null);
         store.SetValue("t", SettingValue.Of(false));
         store.SetLocked("t", true);
-        var rec = new Reconciler(store);
-        for (var i = 0; i < 5; i++) Assert.Single(rec.Reconcile(Snap(Toggle("t", true))).ToApply);
+        var clock = new FakeClock();
+        return (store, new Reconciler(store, () => clock.Now), clock);
+    }
+
+    [Fact]
+    public void A_burst_of_restores_is_not_fighting()
+    {
+        var (_, rec, clock) = LockedToggle();
+        for (var i = 0; i < 20; i++)
+        {
+            var r = rec.Reconcile(Snap(Toggle("t", true)));
+            Assert.Equal(DriftState.Restoring, r.Status["t"].State);
+            clock.Advance(0.1);
+        }
+    }
+
+    [Fact]
+    public void Being_undone_for_30_seconds_is_fighting_until_the_user_restores()
+    {
+        var (_, rec, clock) = LockedToggle();
+        for (var i = 0; i < 5; i++)
+        {
+            Assert.Single(rec.Reconcile(Snap(Toggle("t", true))).ToApply);
+            clock.Advance(8);
+        }
         var r = rec.Reconcile(Snap(Toggle("t", true)));
         Assert.Equal(DriftState.Fighting, r.Status["t"].State);
         Assert.Empty(r.ToApply);
 
         rec.ResetFight("t");
         Assert.Single(rec.Reconcile(Snap(Toggle("t", true))).ToApply);
+    }
+
+    [Fact]
+    public void Separate_bursts_with_a_pause_between_them_are_not_one_fight()
+    {
+        var (_, rec, clock) = LockedToggle();
+        for (var burst = 0; burst < 4; burst++)
+        {
+            for (var i = 0; i < 10; i++) { rec.Reconcile(Snap(Toggle("t", true))); clock.Advance(0.5); } // a 5 s drag
+            clock.Advance(12);                                                                         // then a pause
+        }
+        Assert.Equal(DriftState.Restoring, rec.Reconcile(Snap(Toggle("t", true))).Status["t"].State);
+    }
+
+    [Fact]
+    public void Restores_right_after_a_user_change_never_count_as_fighting()
+    {
+        var (_, rec, clock) = LockedToggle();
+        for (var i = 0; i < 40; i++)
+        {
+            if (i % 4 == 0) rec.UserChanged("t"); // e.g. dragging a slider on a slow device
+            Assert.Equal(DriftState.Restoring, rec.Reconcile(Snap(Toggle("t", true))).Status["t"].State);
+            clock.Advance(1);
+        }
+    }
+
+    [Fact]
+    public void Level_the_device_rounds_to_becomes_the_desired_value()
+    {
+        var store = new DesiredStore(null);
+        store.SetValue("l", SettingValue.Of(-10.0));
+        store.SetLocked("l", true);
+        var clock = new FakeClock();
+        var rec = new Reconciler(store, () => clock.Now);
+
+        rec.UserChanged("l");
+        var r = rec.Reconcile(Snap(Level("l", -11.2, step: 1.5)));
+        Assert.Equal(DriftState.None, r.Status["l"].State);
+        Assert.Equal(-11.2, store.Get("l")!.Value.Number);
+
+        // Outside the grace period a change is drift again, and the lock restores it.
+        clock.Advance(5);
+        r = rec.Reconcile(Snap(Level("l", -20, step: 1.5)));
+        Assert.Equal(-11.2, Assert.Single(r.ToApply).Value.Number);
     }
 
     [Fact]

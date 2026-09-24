@@ -66,7 +66,7 @@ public sealed class Engine : IDisposable
     public void Set(string id, SettingValue value) => Post(() =>
     {
         _store.SetValue(id, value);
-        _reconciler.ResetFight(id);
+        _reconciler.UserChanged(id);
         if (Find(id) is { } s) Try(() => _audio!.Apply(s, value));
     });
 

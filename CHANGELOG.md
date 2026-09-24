@@ -3,6 +3,15 @@
 Release notes are taken from the section matching the tag (e.g. `## 0.1.0`). If there isn't one, the release lists the
 commits since the previous tag instead.
 
+## 0.3.1
+
+- **Fewer false "something keeps changing it back" warnings.** Dragging a slider in the Sound control panel writes many
+  times a second; with the setting locked, that used to trip the warning within a moment. Now a lock only counts as
+  fighting when something has kept undoing it for 30 seconds without a break. AltMixer then pauses, and tries again
+  after 10 seconds of quiet or when you click Restore.
+- Moving a locked slider in AltMixer no longer fights the device: when a device rounds a level to a step it supports,
+  that becomes the desired value.
+
 ## 0.3.0
 
 - **App icon**: three mixer faders on a blue tile, used for the exe, window, taskbar, Start menu shortcut and
