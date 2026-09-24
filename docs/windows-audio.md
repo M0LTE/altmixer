@@ -1,10 +1,7 @@
-# Spike findings (2026-09-24, Windows 11 Pro 26100)
+# Windows audio: what AltMixer relies on
 
-Probe: `spike/Probe` (C# .NET 10 console, raw COM interop). Run `Probe.exe <cmd>`:
-`list [--all]`, `defaults`, `setdefault <dev> [all|default|comms]`, `watch [--lock] [secs]`, `bench-revert`,
-`props <dev>`, `topo <dev>`, `measure <dev>`, `sessions`, `approute`, `fx <dev> [get|on|off|rewrite]`,
-`setprop <dev> <fx 0|1> <fmtid> <pid> <uint|true|false>`, `format <dev>`, `snapshot <file>`, `diff <a> <b>`.
-`<dev>` = index from `list`, or a substring of the name/id.
+Findings from probing Windows 11 Pro 26100 (September 2026) against real devices: an Icom/TI USB Audio CODEC, a CM108,
+an AIOC, a Logitech StreamCam, Realtek and NVIDIA HDMI audio. Much of this is undocumented, so it's recorded here.
 
 ## Nothing needs elevation
 All endpoint property writes via `IPolicyConfig.SetPropertyValue` (and even `IMMDevice.OpenPropertyStore(STGM_READWRITE)`)

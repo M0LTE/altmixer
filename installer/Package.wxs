@@ -6,6 +6,8 @@
     <MajorUpgrade DowngradeErrorMessage="A newer version of AltMixer is already installed." />
     <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
 
+    <Icon Id="AltMixer.ico" SourceFile="$(sys.SOURCEFILEDIR)..\src\AltMixer\AltMixer.ico" />
+    <Property Id="ARPPRODUCTICON" Value="AltMixer.ico" />
     <Property Id="ARPURLINFOABOUT" Value="https://github.com/M0LTE/altmixer" />
     <Property Id="ARPNOMODIFY" Value="1" />
     <Property Id="ARPHELPLINK" Value="https://github.com/M0LTE/altmixer/issues" />

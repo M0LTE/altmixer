@@ -108,11 +108,10 @@ public sealed class SettingViewModel : Observable
     }
 
     DriftState _state;
-    public DriftState State { get => _state; private set { if (Set(ref _state, value)) { Raise(nameof(IsDrifted)); Raise(nameof(IsFighting)); Raise(nameof(IsUnavailable)); Raise(nameof(CanAct)); } } }
+    public DriftState State { get => _state; private set { if (Set(ref _state, value)) { Raise(nameof(IsDrifted)); Raise(nameof(IsFighting)); Raise(nameof(IsUnavailable)); } } }
     public bool IsDrifted => _state is DriftState.Drifted or DriftState.Fighting;
     public bool IsFighting => _state == DriftState.Fighting;
     public bool IsUnavailable => _state == DriftState.Unavailable;
-    public bool CanAct => IsDrifted;
 
     string _driftText = "";
     public string DriftText { get => _driftText; private set => Set(ref _driftText, value); }

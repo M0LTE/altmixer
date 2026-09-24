@@ -3,6 +3,13 @@
 Release notes are taken from the section matching the tag (e.g. `## 0.1.0`). If there isn't one, the release lists the
 commits since the previous tag instead.
 
+## 0.3.0
+
+- **App icon**: three mixer faders on a blue tile, used for the exe, window, taskbar, Start menu shortcut and
+  Add/Remove Programs.
+- The tray icon now uses the app icon, with an amber dot when a setting has changed outside AltMixer.
+- Repository tidy: the investigation tooling is gone; its findings live on in `docs/windows-audio.md`.
+
 ## 0.2.0
 
 - **Reorder devices** by dragging the handle on each card, or with ↑ / ↓ on a focused handle. The order is saved,

@@ -8,8 +8,8 @@ namespace AltMixer;
 sealed class Tray : IDisposable
 {
     readonly Forms.NotifyIcon _icon;
-    readonly Icon _ok = Draw(Color.FromArgb(0x3F, 0xB9, 0x50));
-    readonly Icon _warn = Draw(Color.FromArgb(0xF0, 0xB2, 0x32));
+    readonly Icon _ok = AppIcon();
+    readonly Icon _warn = WithBadge(AppIcon(), Color.FromArgb(0xF0, 0xB2, 0x32));
     bool? _drifted;
 
     public Tray(Action show, Action restoreAll, Action exit)
@@ -42,22 +42,26 @@ sealed class Tray : IDisposable
         _icon.Dispose();
     }
 
-    /// <summary>Three mixer faders, with the status colour on the knobs.</summary>
-    static Icon Draw(Color knob)
+    /// <summary>The app icon at the notification area's size.</summary>
+    static Icon AppIcon()
     {
-        using var bmp = new Bitmap(32, 32);
+        using var stream = System.Windows.Application.GetResourceStream(new Uri("pack://application:,,,/AltMixer.ico")).Stream;
+        return new Icon(stream, Forms.SystemInformation.SmallIconSize);
+    }
+
+    /// <summary>The icon with a status dot in the bottom-right corner.</summary>
+    static Icon WithBadge(Icon icon, Color colour)
+    {
+        using var bmp = icon.ToBitmap();
         using (var g = Graphics.FromImage(bmp))
         {
             g.SmoothingMode = SmoothingMode.AntiAlias;
-            using var track = new Pen(Color.FromArgb(220, 230, 230, 230), 3);
-            using var fill = new SolidBrush(knob);
-            int[] knobs = [20, 8, 14];
-            for (var i = 0; i < 3; i++)
-            {
-                var x = 6 + i * 10;
-                g.DrawLine(track, x, 3, x, 29);
-                g.FillEllipse(fill, x - 5, knobs[i] - 5, 10, 10);
-            }
+            var d = bmp.Width * 0.55f;
+            var x = bmp.Width - d;
+            using var outline = new SolidBrush(Color.FromArgb(0x20, 0x20, 0x20));
+            using var fill = new SolidBrush(colour);
+            g.FillEllipse(outline, x - 1, x - 1, d + 1, d + 1);
+            g.FillEllipse(fill, x, x, d - 1, d - 1);
         }
         return Icon.FromHandle(bmp.GetHicon());
     }

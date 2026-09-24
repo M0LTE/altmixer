@@ -74,8 +74,9 @@ release is made.
     enforces locks, so it keeps working while the window is hidden.
 - `src/AltMixer`: WPF UI (Fluent theme, follows Windows light/dark), tray icon, start at login.
 - `tests/AltMixer.Core.Tests`: reconciler and store tests.
-- `installer/`: WiX MSI. `build/release-notes.ps1`: release notes.
-- `spike/`: the investigation. See `spike/FINDINGS.md` for where Windows keeps each setting and what was measured.
+- `installer/`: WiX MSI.
+- `build/`: `release-notes.ps1` (release notes) and `make-icon.ps1` (regenerates `AltMixer.ico`).
+- `docs/windows-audio.md`: where Windows keeps each setting, what needs which API, and what was measured.
 
 ## Known limitations
 

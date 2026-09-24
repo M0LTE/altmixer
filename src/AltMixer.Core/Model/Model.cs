@@ -80,7 +80,7 @@ public sealed record DeviceInfo
     public bool IsComms { get; init; }
 }
 
-public sealed record AppInfo(string Key, string Name, IReadOnlyList<Flow> Flows);
+public sealed record AppInfo(string Key, string Name);
 
 public sealed record Snapshot(IReadOnlyList<DeviceInfo> Devices, IReadOnlyList<AppInfo> Apps, IReadOnlyList<Setting> Settings)
 {

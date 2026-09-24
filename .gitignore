@@ -2,7 +2,4 @@ bin/
 obj/
 .vs/
 *.user
-spike/probe2/
-spike/*.log
-spike/snap-*.txt
 publish/

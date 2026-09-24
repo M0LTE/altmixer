@@ -349,7 +349,7 @@ public static unsafe class AppRouting
     }
 }
 
-// ---------- WASAPI capture (for measuring what a level setting really does) ----------
+// ---------- WASAPI client (used to list the formats a device supports) ----------
 
 [ComImport, Guid("1CB9AD4C-DBFA-4c32-B178-C2F568A703B2"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 public interface IAudioClient
@@ -368,13 +368,6 @@ public interface IAudioClient
     void GetService(ref Guid iid, [MarshalAs(UnmanagedType.IUnknown)] out object svc);
 }
 
-[ComImport, Guid("C8ADBD64-E71E-48a0-A4DE-185C395CD317"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-public interface IAudioCaptureClient
-{
-    [PreserveSig] int GetBuffer(out IntPtr data, out uint frames, out uint flags, out ulong devPos, out ulong qpc);
-    void ReleaseBuffer(uint frames);
-    void GetNextPacketSize(out uint frames);
-}
 
 [ComImport, Guid("657804FA-D6AD-4496-8A60-352752AF4F89"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 public interface IAudioEndpointVolumeCallback

@@ -293,7 +293,7 @@ public sealed partial class AudioSystem : IDisposable
             var owner = Ids.AppOwner(key);
             var outputs = levels.Where(l => l.Key.key == key).ToList();
             if (outputs.Count == 0 && (key == SystemSoundsKey || !AppRouting.Available)) continue;
-            result.Add(new AppInfo(key, name, pids.Keys.OrderBy(f => f).ToList()));
+            result.Add(new AppInfo(key, name));
             var single = outputs.Count == 1;
             foreach (var ((_, deviceId), (vol, mute)) in outputs)
             {

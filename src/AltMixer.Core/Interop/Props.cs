@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 
 namespace AltMixer.Core.Interop;
 
-/// <summary>Typed reads/writes of endpoint properties through IPolicyConfig (works unelevated; see spike/FINDINGS.md).</summary>
+/// <summary>Typed reads/writes of endpoint properties through IPolicyConfig (works unelevated; see docs/windows-audio.md).</summary>
 public static class Props
 {
     const ushort VT_BOOL = 11, VT_UI4 = 19, VT_LPWSTR = 31, VT_BLOB = 65;
