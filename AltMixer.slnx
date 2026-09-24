@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/AltMixer.Core/AltMixer.Core.csproj" />
+    <Project Path="src/AltMixer/AltMixer.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/AltMixer.Core.Tests/AltMixer.Core.Tests.csproj" />
+  </Folder>
+</Solution>
