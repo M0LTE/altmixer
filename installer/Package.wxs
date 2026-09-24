@@ -8,6 +8,7 @@
 
     <Property Id="ARPURLINFOABOUT" Value="https://github.com/M0LTE/altmixer" />
     <Property Id="ARPNOMODIFY" Value="1" />
+    <Property Id="ARPHELPLINK" Value="https://github.com/M0LTE/altmixer/issues" />
 
     <StandardDirectory Id="ProgramFiles64Folder">
       <Directory Id="INSTALLFOLDER" Name="AltMixer">

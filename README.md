@@ -83,3 +83,7 @@ release is made.
   isn't verified yet.
 - "Listen to this device" always plays through the default output; choosing a different target isn't supported yet.
 - One profile. The store is keyed by profile so named profiles can be added.
+
+## Licence
+
+[GNU AGPL v3](LICENSE). Copyright (C) 2026 M0LTE.
